@@ -5,27 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Visualization</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        #startButton {
-            padding: 10px 20px;
-            background-color: #fff;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-        }
+       body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #000;
+    position: relative;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* canvas stays below the button */
+}
+
+#startButton {
+    padding: 10px 20px;
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    z-index: 2; /* button is on top of the canvas */
+    position: fixed; /* button stays at a fixed position */
+    top: 50%; /* centered vertically */
+    left: 50%; /* centered horizontally */
+    transform: translate(-50%, -50%); /* centers button completely */
+}
+
     </style>
 </head>
 <body>
