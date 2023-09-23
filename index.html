@@ -9,19 +9,34 @@
             margin: 0;
             overflow: hidden;
             background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         canvas {
-            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #startButton {
+            padding: 10px 20px;
+            background-color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
-    <audio id="audio" src="sampleaudio.mp3" autoplay></audio>
+    <audio id="audio" src="path_to_your_audio_file.mp3"></audio>
+    <button id="startButton">Start</button>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const audio = document.getElementById('audio');
+        const startButton = document.getElementById('startButton');
         
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -54,22 +69,23 @@
             let x = 0;
 
             for (let i = 0; i < bufferLength; i++) {
-                barHeight = dataArray[i] / 2; // Reduced the intensity for visual effect
+                barHeight = dataArray[i] / 2;
                 ctx.fillStyle = 'white';
                 ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
                 x += barWidth + 1;
             }
         }
 
-        audio.onplay = () => {
+        startButton.addEventListener('click', function() {
             audioContext.resume().then(() => {
+                audio.play();
                 animate();
+                startButton.style.display = 'none'; // Hide the button once clicked
             });
-        };
+        });
 
         // Initially draw the dot
         drawDot();
-
     </script>
 </body>
 </html>
