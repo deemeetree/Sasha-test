@@ -27,34 +27,47 @@
     </style>
 </head>
 <body>
+    <canvas id="canvas"></canvas>
     <audio id="audio" src="sampleaudio.mp3"></audio>
     <button id="startButton">Start</button>
     <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
         const audio = document.getElementById('audio');
         const startButton = document.getElementById('startButton');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function draw() {
+            requestAnimationFrame(draw);
+            analyser.getByteFrequencyData(dataArray);
+            
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, 10 + average, 0, 2 * Math.PI);
+            ctx.fill();
+        }
 
         startButton.addEventListener('click', function() {
-            if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
-                const audioContext = new (AudioContext || webkitAudioContext)();
-                const unlock = function() {
-                    audioContext.resume().then(() => {
-                        document.body.removeEventListener('click', unlock);
-                        document.body.removeEventListener('touchstart', unlock);
-                        audio.play().catch(e => {
-                            alert('Autoplay was blocked. Try clicking the button again.');
-                        });
-                    });
-                };
-
-                document.body.addEventListener('click', unlock, false);
-                document.body.addEventListener('touchstart', unlock, false);
-            } else {
-                audio.play().catch(e => {
-                    alert('Autoplay was blocked. Try clicking the button again.');
-                });
-            }
-            
-            startButton.style.display = 'none';
+            audioContext.resume().then(() => {
+                audio.play();
+                draw();
+                startButton.style.display = 'none';
+            });
         });
     </script>
 </body>
